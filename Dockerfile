@@ -51,5 +51,5 @@ RUN set -xe \
 EXPOSE 80
 EXPOSE 443
 
-#ENTRYPOINT /usr/local/bin/pie-entrypoint.sh
+ENTRYPOINT /usr/local/bin/pie-entrypoint.sh
 CMD httpd-foreground
