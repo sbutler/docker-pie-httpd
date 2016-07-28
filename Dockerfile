@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM sbutler/pie-base
 
 ENV PIE_EXP_MEMORY_SIZE 30
 
