@@ -3,7 +3,7 @@ set -e
 
 echoerr () { echo "$@" 1>&2; }
 
-if [[ "$1" == "httpd-foreground" ]]; then
+if [[ "$1" == "apache2-pie" ]]; then
   shift
 
   # Attempt to set ServerLimit and MaxRequestWorkers based on the amount of

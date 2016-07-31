@@ -39,7 +39,7 @@ RUN set -xe \
         --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-COPY etc/apache2/ /etc/apache2
+COPY etc/ /etc
 COPY pie-entrypoint.sh /usr/local/bin/
 
 RUN set -xe \
@@ -53,4 +53,4 @@ EXPOSE 80
 EXPOSE 443
 
 ENTRYPOINT ["/usr/local/bin/pie-entrypoint.sh"]
-CMD ["httpd-foreground"]
+CMD ["apache2-pie"]
