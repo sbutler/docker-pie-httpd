@@ -41,13 +41,19 @@ RUN set -xe \
 
 COPY etc/ /etc
 COPY pie-entrypoint.sh /usr/local/bin/
+COPY pie-sitegen.pl /usr/local/bin/
 
 RUN set -xe \
     && for mod in $HTTPD_DISMOD; do a2dismod $mod; done \
     && for mod in $HTTPD_ENMOD; do a2enmod $mod; done \
     && for conf in $HTTPD_DISCONF; do a2disconf $conf; done \
     && for conf in $HTTPD_ENCONF; do a2enconf $conf; done \
-    && chmod a+rx /usr/local/bin/pie-entrypoint.sh
+    && a2ensite 00pie-sites \
+    && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
+    && chmod a+rx /usr/local/bin/pie-sitegen.pl
+
+VOLUME /etc/opt/pie/apache2
+VOLUME /var/www
 
 EXPOSE 80
 EXPOSE 443
