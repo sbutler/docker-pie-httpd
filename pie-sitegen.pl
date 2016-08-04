@@ -7,6 +7,7 @@ use File::Basename;
 use File::Spec::Functions qw/:DEFAULT rel2abs/;
 use Getopt::Long;
 use IO::Socket::SSL::Utils;
+use Log::Dispatch;
 use Template;
 
 my $opt_sitesdir = '/etc/opt/pie/apache2/sites';
@@ -28,12 +29,26 @@ HERE
   exit 1;
 }
 
+my $logger = Log::Dispatch->new(
+  outputs => [
+    [ 'Screen',
+        min_level => 'info',
+        newline => 1,
+        callbacks => sub {
+          my %args = @_;
+
+          return sprintf "[%s] %s", uc $args{ 'level' }, $args{ 'message' };
+        }
+    ],
+  ],
+);
+
 unless (-d $opt_sitesdir) {
-  printf STDERR "Sites directory does not exist: %s\n", $opt_sitesdir;
+  $logger->error( "Sites directory does not exist: $opt_sitesdir" );
   exit 1;
 }
 unless (-d $opt_outputdir) {
-  printf STDERR "Output directory does not exist: %s\n", $opt_outputdir;
+  $logger->error("Output directory does not exist: $opt_outputdir" );
   exit 1;
 }
 
@@ -42,16 +57,16 @@ my $tt = Template->new({
   OUTPUT_PATH     => rel2abs($opt_outputdir),
 });
 unless ($tt) {
-  printf STDERR "Unable to create Template object: %s\n", Template->error;
+  $logger->error( "Unable to create Template object: " . Template->error );
   exit 2;
 }
 
-# Clean out the output directory
+$logger->info( "Clearing $opt_outputdir/*.conf" );
 unlink <"$opt_outputdir/*.conf">;
 
 my $sitesh;
 unless (opendir( $sitesh, $opt_sitesdir )) {
-  printf STDERR "Cannot open %s: %s\n", $opt_sitesdir, $!;
+  $logger->error( "Cannot open $opt_sitesdir: $!" );
   exit 2;
 }
 
@@ -59,11 +74,12 @@ SITEDIR: while (my $sitename = readdir( $sitesh )) {
   my $path = catdir( $opt_sitesdir, $sitename );
   next SITEDIR unless -d $path && $sitename !~ /^[._]/;
 
+  $logger->info( "Processing $sitename ($path)" );
   chdir $path;
 
-  my $template = 'site.conf.template';
+  my $template = 'site.conf.tt2';
   unless (-f $template) {
-    printf STDERR "No site.conf.template file in %s\n", $sitename;
+    $logger->warn( "No site.conf.tt2 file in $sitename" );
     next SITEDIR;
   }
   my %template_vars = (
@@ -73,12 +89,13 @@ SITEDIR: while (my $sitename = readdir( $sitesh )) {
 
   process_ssl( \%template_vars );
 
+  $logger->info( "Building $sitename.conf" );
   unless ($tt->process(
     catfile( $sitename, $template ),
     \%template_vars,
     "$sitename.conf"
   )) {
-    printf STDERR "Error processing template %s: %s\n", $sitename, $tt->error;
+    $logger->warn( "Error processing template for $sitename: " . $tt->error );
     next SITEDIR;
   }
 }
@@ -98,12 +115,13 @@ sub process_ssl {
 
     my $key = catfile( $key_path, "$name.key" );
     unless (-f $key) {
-      printf STDERR "No key file for SSL certificate %s\n", $crt;
+      $logger->warn( "Key file not found: $key" );
       next SSLCRT;
     }
 
     my $chn = catfile( $chn_path, "$name.crt" );
 
+    $logger->info( "Reading SSL certificate: $crt" );
     my ($crt_obj, $crt_hash);
     eval {
       $crt_obj = PEM_file2cert( $crt );
@@ -114,7 +132,7 @@ sub process_ssl {
       eval { CERT_free( $crt_obj ); $crt_obj = undef; }
     }
     if ($crt_err || !$crt_hash) {
-      printf STDERR "Unable to read SSL certificate file %s: %s\n", $crt, $crt_err;
+      $logger->warn( "Error reading file $crt: $crt_err" );
       next SSLCRT;
     }
 
