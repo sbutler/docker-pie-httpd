@@ -3,6 +3,9 @@ FROM sbutler/pie-base
 ENV PIE_EXP_MEMORY_SIZE 30
 ENV PIE_RES_MEMORY_SIZE 50
 
+ENV PHP_FPM_HOSTNAME  pie-php.local
+ENV PHP_FPM_PORT      9000
+
 ENV HTTPD_DISMOD "$HTTPD_DISMOD \
     mpm_event \
     "
