@@ -1,3 +1,5 @@
+ServerAdmin ${APACHE_SERVER_ADMIN}
+
 ServerName [% server_name %]
 [%- FOREACH server_alias IN server_aliases; IF server_name != server_alias %]
 ServerAlias [% server_alias %]

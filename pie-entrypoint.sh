@@ -85,7 +85,7 @@ if [[ "$1" == "apache2-pie" ]]; then
   rm -f "$APACHE_PID_FILE"
 
   pie-sitegen.pl 1>&2
-  exec apache2 -DFOREGROUND "$@"
+  exec apache2 -DFOREGROUND -DPIE "$@"
 else
   exec "$@"
 fi

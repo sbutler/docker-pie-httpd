@@ -3,6 +3,8 @@ FROM sbutler/pie-base
 ENV PIE_EXP_MEMORY_SIZE 30
 ENV PIE_RES_MEMORY_SIZE 50
 
+ENV APACHE_SERVER_ADMIN webmaster@example.org
+
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000
 
