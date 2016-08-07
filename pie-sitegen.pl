@@ -10,7 +10,7 @@ use IO::Socket::SSL::Utils;
 use Log::Dispatch;
 use Template;
 
-my $opt_sitesdir = '/etc/opt/pie/apache2/sites';
+my $opt_sitesdir = '/etc/opt/pie/apache2/sites-template';
 my $opt_outputdir = '/etc/apache2/sites-pie';
 my @opt_includedirs = (
   '/opt/pie/apache2/sites/pie',
@@ -26,7 +26,7 @@ Usage: pie-sitegen.pl [options]
 
 Options:
 --sitesdir      Location of the PIE formatted sites to process. This defaults
-                to /etc/opt/pie/apache2/sites.
+                to /etc/opt/pie/apache2/sites-template.
 --outputdir     Location to place processed templates. This defaults to
                 /etc/apache2/sites-pie.
 --includedir    Additional include directories for templates. This can be
