@@ -45,6 +45,7 @@ RUN set -xe \
     && rm -rf /var/lib/apt/lists/*
 
 COPY etc/ /etc
+COPY opt/ /opt
 COPY pie-entrypoint.sh /usr/local/bin/
 COPY pie-sitegen.pl /usr/local/bin/
 

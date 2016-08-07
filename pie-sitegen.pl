@@ -12,10 +12,14 @@ use Template;
 
 my $opt_sitesdir = '/etc/opt/pie/apache2/sites';
 my $opt_outputdir = '/etc/apache2/sites-pie';
+my @opt_includedirs = (
+  '/opt/pie/apache2/sites/pie',
+);
 
 unless (GetOptions(
   'sitesdir=s'     => \$opt_sitesdir,
-  'outputdir=s'    => \$opt_outputdir
+  'outputdir=s'    => \$opt_outputdir,
+  'includedir=s'   => \@opt_includedirs,
 )) {
   print STDERR <<HERE;
 Usage: pie-sitegen.pl [options]
@@ -25,6 +29,10 @@ Options:
                 to /etc/opt/pie/apache2/sites.
 --outputdir     Location to place processed templates. This defaults to
                 /etc/apache2/sites-pie.
+--includedir    Additional include directories for templates. This can be
+                specified multiple times to include more than one directory.
+                The sitedir is always an include directory. This defaults to
+                /opt/pie/apache2/sites/pie.
 HERE
   exit 1;
 }
@@ -53,7 +61,7 @@ unless (-d $opt_outputdir) {
 }
 
 my $tt = Template->new({
-  INCLUDE_PATH    => rel2abs($opt_sitesdir),
+  INCLUDE_PATH    => [ rel2abs($opt_sitesdir), @opt_includedirs ],
   OUTPUT_PATH     => rel2abs($opt_outputdir),
 });
 unless ($tt) {
