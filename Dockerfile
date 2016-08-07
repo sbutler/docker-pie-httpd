@@ -8,6 +8,10 @@ ENV APACHE_SERVER_ADMIN webmaster@example.org
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000
 
+ENV SHIBD_HOSTNAME    pie-shibd.local
+ENV SHIBD_IPADDR      ""
+ENV SHIBD_PORT        1600
+
 ENV HTTPD_DISMOD "$HTTPD_DISMOD \
     mpm_event \
     "
@@ -59,6 +63,7 @@ RUN set -xe \
     && chmod a+rx /usr/local/bin/pie-sitegen.pl
 
 VOLUME /etc/opt/pie/apache2
+VOLUME /etc/opt/pie/shibboleth
 VOLUME /var/www
 
 EXPOSE 80
