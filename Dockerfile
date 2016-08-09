@@ -1,18 +1,10 @@
 FROM sbutler/pie-base
 
-ENV PIE_EXP_MEMORY_SIZE 30
-ENV PIE_RES_MEMORY_SIZE 50
-
-ENV APACHE_SERVER_ADMIN webmaster@example.org
-
-ENV PHP_FPM_HOSTNAME  pie-php.local
-ENV PHP_FPM_PORT      9000
-
-ENV HTTPD_DISMOD "$HTTPD_DISMOD \
+ARG HTTPD_DISMOD="\
     mpm_event \
     "
 
-ENV HTTPD_ENMOD "$HTTPD_ENMOD \
+ARG HTTPD_ENMOD="\
     allowmethods \
     expires \
     headers \
@@ -27,13 +19,13 @@ ENV HTTPD_ENMOD "$HTTPD_ENMOD \
     pie-mpm-event \
     "
 
-ENV HTTPD_DISCONF "$HTTPD_DISCONF \
+ARG HTTPD_DISCONF="\
     other-vhosts-access-log \
     serve-cgi-bin \
     localized-error-pages \
     "
 
-ENV HTTPD_ENCONF "$HTTPD_ENCONF \
+ARG HTTPD_ENCONF="\
     pie-security \
     pie-logs \
     pie-error-pages \
@@ -60,6 +52,14 @@ RUN set -xe \
     && a2ensite 00pie-sites && a2ensite default-ssl \
     && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
     && chmod a+rx /usr/local/bin/pie-sitegen.pl
+
+ENV PIE_EXP_MEMORY_SIZE 30
+ENV PIE_RES_MEMORY_SIZE 50
+
+ENV APACHE_SERVER_ADMIN webmaster@example.org
+
+ENV PHP_FPM_HOSTNAME  pie-php.local
+ENV PHP_FPM_PORT      9000
 
 VOLUME /etc/opt/pie/apache2
 VOLUME /var/www
