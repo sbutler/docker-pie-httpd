@@ -62,7 +62,6 @@ RUN set -xe \
     && chmod a+rx /usr/local/bin/pie-sitegen.pl
 
 VOLUME /etc/opt/pie/apache2
-VOLUME /etc/opt/pie/shibboleth
 VOLUME /var/www
 
 EXPOSE 80
