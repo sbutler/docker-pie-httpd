@@ -84,21 +84,6 @@ if [[ "$1" == "apache2-pie" ]]; then
 
   rm -f "$APACHE_PID_FILE"
 
-  if [[ -z "$SHIBD_IPADDR" ]]; then
-    SHIBD_IPADDR=$(getent hosts "$SHIBD_HOSTNAME" | awk '{ print $1 }')
-  fi
-
-  for tt2_f in /etc/opt/pie/shibboleth/*.tt2; do
-    f="$(basename -s .tt2 "$tt2_f")"
-    echoerr "Processing $tt2_f -> $f..."
-    tpage \
-      --define "APACHE_SERVER_ADMIN=${APACHE_SERVER_ADMIN}" \
-      --define "SHIBD_HOSTNAME=${SHIBD_HOSTNAME}" \
-      --define "SHIBD_IPADDR=${SHIBD_IPADDR}" \
-      --define "SHIBD_PORT=${SHIBD_PORT}" \
-      "$tt2_f" > "/etc/shibboleth/$f"
-  done
-
   pie-sitegen.pl 1>&2
   exec apache2 -DFOREGROUND -DPIE "$@"
 else

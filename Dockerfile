@@ -8,10 +8,6 @@ ENV APACHE_SERVER_ADMIN webmaster@example.org
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000
 
-ENV SHIBD_HOSTNAME    pie-shibd.local
-ENV SHIBD_IPADDR      ""
-ENV SHIBD_PORT        1600
-
 ENV HTTPD_DISMOD "$HTTPD_DISMOD \
     mpm_event \
     "
@@ -20,6 +16,7 @@ ENV HTTPD_ENMOD "$HTTPD_ENMOD \
     allowmethods \
     expires \
     headers \
+    include \
     macro \
     proxy \
     proxy_fcgi \
@@ -33,11 +30,13 @@ ENV HTTPD_ENMOD "$HTTPD_ENMOD \
 ENV HTTPD_DISCONF "$HTTPD_DISCONF \
     other-vhosts-access-log \
     serve-cgi-bin \
+    localized-error-pages \
     "
 
 ENV HTTPD_ENCONF "$HTTPD_ENCONF \
     pie-security \
     pie-logs \
+    pie-error-pages \
     "
 
 RUN set -xe \
