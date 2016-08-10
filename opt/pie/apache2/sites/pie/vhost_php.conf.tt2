@@ -1,4 +1,5 @@
 [% INCLUDE _common/vhost.conf.tt2 %]
 
-ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://${PHP_FPM_HOSTNAME}:${PHP_FPM_PORT}/var/www/vhosts/[% vhost_name %]/html/$1
-DirectoryIndex index.php
+<FilesMatch "\.php$">
+  SetHandler proxy:fcgi://${PHP_FPM_HOSTNAME}:${PHP_FPM_PORT}
+</FilesMatch>

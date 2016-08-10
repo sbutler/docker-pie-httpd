@@ -16,13 +16,15 @@ DocumentRoot "/var/www/vhosts/[% vhost_name %]/html"
 Options SymLinksIfOwnerMatch
 RewriteEngine on
 
-# Make sure /Shibboleth.sso is always handled by mod_shib
-<Location /Shibboleth.sso>
-  Require all granted
-  SetHandler shib
-</Location>
+<IfModule mod_shib.cpp>
+  # Make sure /Shibboleth.sso is always handled by mod_shib
+  <Location /Shibboleth.sso>
+    Require all granted
+    SetHandler shib
+  </Location>
 
-Alias /shibboleth-sp/ /usr/share/shibboleth/
-<Directory /usr/share/shibboleth/>
-  Require all granted
-</Directory>
+  Alias /shibboleth-sp/ /usr/share/shibboleth/
+  <Directory /usr/share/shibboleth/>
+    Require all granted
+  </Directory>
+</IfModule>
