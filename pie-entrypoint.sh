@@ -24,31 +24,16 @@ if [[ "$1" == "apache2-pie" ]]; then
   fi
   (( ram_limit <= 0 )) && ram_limit=$(free -m | awk '/^Mem:/ { print $4 }')
 
-  swp_limit=0
-  if [[ -f "/sys/fs/cgroup/memory/memory.memsw.limit_in_bytes" ]]; then
-    swp_limit=$(</sys/fs/cgroup/memory/memory.memsw.limit_in_bytes)
-    if [[ "$swp_limit" = "9223372036854771712" ]]; then
-      swp_limit=0
-    else
-      swp_limit=$(echo "$swp_limit" | awk '{ print int( $1 / 1048576 ) }')
-    fi
-  fi
-  (( swp_limit <= 0 )) && swp_limit=$(free -m | awk '/^Swap:/ { print $4 }')
-
-  tot_limit=$(( ram_limit + swp_limit ))
-
   echoerr "exp_memory_size: $exp_memory_size MB"
   echoerr "res_memory_size: $res_memory_size MB"
   echoerr "ram_limit: $ram_limit MB"
-  echoerr "swp_limit: $swp_limit MB"
-  echoerr "tot_limit: $tot_limit MB"
 
   APACHE_THREADS_PER_CHILD=25
   APACHE_SERVER_LIMIT=16
 
-  if (( tot_limit > 0 )); then
+  if (( ram_limit > 0 )); then
     APACHE_SERVER_LIMIT=$( \
-      echo "$exp_memory_size $res_memory_size $tot_limit" \
+      echo "$exp_memory_size $res_memory_size $ram_limit" \
       | awk '{ print int( ($3 - $2) / $1 ) }' \
     )
     if (( APACHE_SERVER_LIMIT < 16 )); then
