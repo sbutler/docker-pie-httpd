@@ -3,6 +3,26 @@ set -e
 
 echoerr () { echo "$@" 1>&2; }
 
+apache_envset () {
+  echoerr "DIR_SUFFIX: ${DIR_SUFFIX:=}"
+	echoerr "APACHE_CONFDIR: ${APACHE_CONFDIR:=/etc/apache2}"
+  if [[ -z "$APACHE_ENVVARS" ]]; then
+    APACHE_ENVVARS=$APACHE_CONFDIR/envvars
+  fi
+  export APACHE_CONFDIR APACHE_ENVVARS
+
+  # Read configuration variable file if it is present
+  if [[ -f /etc/default/apache2$DIR_SUFFIX ]]; then
+    . /etc/default/apache2$DIR_SUFFIX
+  elif [[ -f /etc/default/apache2 ]]; then
+    . /etc/default/apache2
+  fi
+
+  . $APACHE_ENVVARS
+
+  rm -f "$APACHE_PID_FILE"
+}
+
 if [[ "$1" == "apache2-pie" ]]; then
   shift
 
@@ -51,26 +71,37 @@ if [[ "$1" == "apache2-pie" ]]; then
 
   export APACHE_THREADS_PER_CHILD APACHE_SERVER_LIMIT APACHE_MAX_REQUEST_WORKERS
 
-  echoerr "DIR_SUFFIX: ${DIR_SUFFIX:=}"
-	echoerr "APACHE_CONFDIR: ${APACHE_CONFDIR:=/etc/apache2}"
-  if [[ -z "$APACHE_ENVVARS" ]]; then
-  	APACHE_ENVVARS=$APACHE_CONFDIR/envvars
-  fi
-  export APACHE_CONFDIR APACHE_ENVVARS
-
-  # Read configuration variable file if it is present
-  if [[ -f /etc/default/apache2$DIR_SUFFIX ]]; then
-  	. /etc/default/apache2$DIR_SUFFIX
-  elif [[ -f /etc/default/apache2 ]]; then
-  	. /etc/default/apache2
-  fi
-
-  . $APACHE_ENVVARS
-
-  rm -f "$APACHE_PID_FILE"
+  apache_envset
 
   pie-sitegen.pl 1>&2
+
+  if [[ -n "$AWS_EIP_ADDRESS" && -n "$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI" ]]; then
+    # Before we steal the IP from any other instance, make sure we are likely to
+    # succeed in launching Apache
+    echoerr "Testing configuration..."
+    apache2 -t -DPIE "$@" 1>&2
+    APACHE_CONFTEST_ERROR=$?
+    [[ $APACHE_CONFTEST_ERROR -ne 0 ]] && exit $APACHE_CONFTEST_ERROR
+
+    # Reasonabily sure apache will launch. Associate the IP to this ec2 container
+    (
+      set -e
+
+      export AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
+      export AWS_DEFAULT_REGION="$(curl -s http://instance-data/latest/dynamic/instance-identity/document | jq .region -r)"
+      instance_id="$(curl -s http://instance-data/latest/meta-data/instance-id)"
+
+      echo "Associating Elastic IP with this instance..."
+      aws ec2 associate-address --instance-id "$instance_id" --public-ip "$AWS_EIP_ADDRESS"
+    ) 1>&2
+  fi
+
   exec apache2 -DFOREGROUND -DPIE "$@"
+elif [[ "$1" == "apache2" ]]; then
+  shift
+
+  apache_envset
+  exec apache2 -DFOREGROUND "$@"
 else
   exec "$@"
 fi

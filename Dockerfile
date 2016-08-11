@@ -39,6 +39,7 @@ RUN set -xe \
         python2.7 \
         unzip \
         curl \
+        jq \
         --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -71,6 +72,8 @@ ENV APACHE_SERVER_ADMIN webmaster@example.org
 
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000
+
+ENV AWS_EIP_ADDRESS   ""
 
 VOLUME /etc/opt/pie/apache2
 VOLUME /var/www
