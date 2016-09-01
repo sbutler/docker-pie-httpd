@@ -79,8 +79,8 @@ VOLUME /etc/opt/pie/apache2
 VOLUME /etc/opt/pie/ssl
 VOLUME /var/www
 
-EXPOSE 80
-EXPOSE 443
+EXPOSE 80 8080
+EXPOSE 443 8443
 
 ENTRYPOINT ["/usr/local/bin/pie-entrypoint.sh"]
 CMD ["apache2-pie"]
