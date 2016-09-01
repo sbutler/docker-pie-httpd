@@ -76,6 +76,7 @@ ENV PHP_FPM_PORT      9000
 ENV AWS_EIP_ADDRESS   ""
 
 VOLUME /etc/opt/pie/apache2
+VOLUME /etc/opt/pie/ssl
 VOLUME /var/www
 
 EXPOSE 80
