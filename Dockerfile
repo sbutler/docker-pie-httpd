@@ -57,14 +57,6 @@ RUN set -xe \
     && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
     && chmod a+rx /usr/local/bin/pie-sitegen.pl
 
-RUN set -xe \
-    && cd /tmp \
-    && curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" \
-    && unzip awscli-bundle.zip \
-    && python2.7 awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws \
-    && rm -fr awscli-bundle.zip awscli-bundle
-
-
 ENV PIE_EXP_MEMORY_SIZE 30
 ENV PIE_RES_MEMORY_SIZE 50
 

@@ -75,27 +75,6 @@ if [[ "$1" == "apache2-pie" ]]; then
 
   pie-sitegen.pl 1>&2
 
-  if [[ -n "$AWS_EIP_ADDRESS" && -n "$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI" ]]; then
-    # Before we steal the IP from any other instance, make sure we are likely to
-    # succeed in launching Apache
-    echoerr "Testing configuration..."
-    apache2 -t -DPIE "$@" 1>&2
-    APACHE_CONFTEST_ERROR=$?
-    [[ $APACHE_CONFTEST_ERROR -ne 0 ]] && exit $APACHE_CONFTEST_ERROR
-
-    # Reasonabily sure apache will launch. Associate the IP to this ec2 container
-    (
-      set -e
-
-      export AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
-      export AWS_DEFAULT_REGION="$(curl -s http://instance-data/latest/dynamic/instance-identity/document | jq .region -r)"
-      instance_id="$(curl -s http://instance-data/latest/meta-data/instance-id)"
-
-      echo "Associating Elastic IP with this instance..."
-      aws ec2 associate-address --instance-id "$instance_id" --public-ip "$AWS_EIP_ADDRESS"
-    ) 1>&2
-  fi
-
   exec apache2 -DFOREGROUND -DPIE "$@"
 elif [[ "$1" == "apache2" ]]; then
   shift
