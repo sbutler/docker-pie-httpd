@@ -78,6 +78,9 @@ elif [[ "$1" == "apache2" ]]; then
 
   apache_envset
   exec apache2 -DFOREGROUND "$@"
+elif [[ "$1" == "apache2"* ]]; then
+  apache_envset
+  exec "$@"
 else
   exec "$@"
 fi

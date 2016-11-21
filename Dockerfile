@@ -6,6 +6,7 @@ ARG HTTPD_DISMOD="\
 
 ARG HTTPD_ENMOD="\
     allowmethods \
+    cgi \
     expires \
     headers \
     include \
@@ -46,16 +47,14 @@ RUN set -xe \
 COPY etc/ /etc
 COPY opt/ /opt
 COPY pie-entrypoint.sh /usr/local/bin/
-COPY pie-sitegen.pl /usr/local/bin/
 
 RUN set -xe \
     && for mod in $HTTPD_DISMOD; do a2dismod $mod; done \
     && for mod in $HTTPD_ENMOD; do a2enmod $mod; done \
     && for conf in $HTTPD_DISCONF; do a2disconf $conf; done \
     && for conf in $HTTPD_ENCONF; do a2enconf $conf; done \
-    && a2ensite 00pie-sites && a2ensite default-ssl \
-    && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
-    && chmod a+rx /usr/local/bin/pie-sitegen.pl
+    && a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-management \
+    && chmod a+rx /usr/local/bin/pie-entrypoint.sh
 
 ENV PIE_EXP_MEMORY_SIZE 30
 ENV PIE_RES_MEMORY_SIZE 50
@@ -65,14 +64,14 @@ ENV APACHE_SERVER_ADMIN webmaster@example.org
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000
 
-ENV AWS_EIP_ADDRESS   ""
-
+VOLUME /etc/apache2/sites-pie
 VOLUME /etc/opt/pie/apache2
 VOLUME /etc/opt/pie/ssl
 VOLUME /var/www
 
 EXPOSE 80 8080
 EXPOSE 443 8443
+EXPOSE 8008
 
 ENTRYPOINT ["/usr/local/bin/pie-entrypoint.sh"]
 CMD ["apache2-pie"]
