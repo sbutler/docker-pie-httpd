@@ -4,28 +4,6 @@ set -e
 echoerr () { echo "$@" 1>&2; }
 
 apache_envset () {
-  echoerr "DIR_SUFFIX: ${DIR_SUFFIX:=}"
-	echoerr "APACHE_CONFDIR: ${APACHE_CONFDIR:=/etc/apache2}"
-  if [[ -z "$APACHE_ENVVARS" ]]; then
-    APACHE_ENVVARS=$APACHE_CONFDIR/envvars
-  fi
-  export APACHE_CONFDIR APACHE_ENVVARS
-
-  # Read configuration variable file if it is present
-  if [[ -f /etc/default/apache2$DIR_SUFFIX ]]; then
-    . /etc/default/apache2$DIR_SUFFIX
-  elif [[ -f /etc/default/apache2 ]]; then
-    . /etc/default/apache2
-  fi
-
-  . $APACHE_ENVVARS
-
-  rm -f "$APACHE_PID_FILE"
-}
-
-if [[ "$1" == "apache2-pie" ]]; then
-  shift
-
   # Attempt to set ServerLimit and MaxRequestWorkers based on the amount of
   # memory in the container. This will never use less than 16 servers, and
   # never more than 2000. If no memory limits are specified, then it will
@@ -71,10 +49,29 @@ if [[ "$1" == "apache2-pie" ]]; then
 
   export APACHE_THREADS_PER_CHILD APACHE_SERVER_LIMIT APACHE_MAX_REQUEST_WORKERS
 
+  echoerr "DIR_SUFFIX: ${DIR_SUFFIX:=}"
+	echoerr "APACHE_CONFDIR: ${APACHE_CONFDIR:=/etc/apache2}"
+  if [[ -z "$APACHE_ENVVARS" ]]; then
+    APACHE_ENVVARS=$APACHE_CONFDIR/envvars
+  fi
+  export APACHE_CONFDIR APACHE_ENVVARS
+
+  # Read configuration variable file if it is present
+  if [[ -f /etc/default/apache2$DIR_SUFFIX ]]; then
+    . /etc/default/apache2$DIR_SUFFIX
+  elif [[ -f /etc/default/apache2 ]]; then
+    . /etc/default/apache2
+  fi
+
+  . $APACHE_ENVVARS
+
+  rm -f "$APACHE_PID_FILE"
+}
+
+if [[ "$1" == "apache2-pie" ]]; then
+  shift
+
   apache_envset
-
-  pie-sitegen.pl 1>&2
-
   exec apache2 -DFOREGROUND -DPIE "$@"
 elif [[ "$1" == "apache2" ]]; then
   shift

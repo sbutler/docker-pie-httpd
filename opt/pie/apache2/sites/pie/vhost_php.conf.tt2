@@ -1,5 +1,0 @@
-[% INCLUDE _common/vhost.conf.tt2 %]
-
-<FilesMatch "\.php$">
-  SetHandler proxy:fcgi://${PHP_FPM_HOSTNAME}:${PHP_FPM_PORT}
-</FilesMatch>

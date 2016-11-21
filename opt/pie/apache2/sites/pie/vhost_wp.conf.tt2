@@ -1,9 +1,0 @@
-[% INCLUDE _common/vhost_php.conf.tt2 %]
-
-# Secure certainl restricted files in WordPress
-#   readme.html
-#   wp-config.php
-#   wp-admin/install.php
-RewriteRule ^/wp-config\. - [F]
-RewriteCond %{REMOTE_HOST} !\.(illinois|uillinois|uiuc)\.edu$
-RewriteRule ^/(readme\.html|wp-admin/install\.php) - [F]
