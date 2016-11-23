@@ -18,6 +18,8 @@ ARG HTTPD_ENMOD="\
     rewrite \
     ssl \
     pie-mpm-event \
+    pie-info \
+    pie-status \
     "
 
 ARG HTTPD_DISCONF="\
@@ -59,7 +61,9 @@ RUN set -xe \
 ENV PIE_EXP_MEMORY_SIZE 30
 ENV PIE_RES_MEMORY_SIZE 50
 
-ENV APACHE_SERVER_ADMIN webmaster@example.org
+ENV APACHE_SERVER_ADMIN   webmaster@example.org
+ENV APACHE_INFO_SUBNET    10.0.0.0/8
+ENV APACHE_STATUS_SUBNET  10.0.0.0/8
 
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000

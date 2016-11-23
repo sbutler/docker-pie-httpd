@@ -20,9 +20,11 @@ try {
   $data{ 'configtest' } = $output;
   die "configtest failed" unless $res;
 
-  $res = run [qw#sudo kill -USR1 1#], '>&', \$output, timeout( 60 );
-  $data{ 'reload' } = $output;
-  die "reload failed" unless $res;
+  if ($cgi->request_method eq 'POST') {
+    $res = run [qw#sudo kill -USR1 1#], '>&', \$output, timeout( 60 );
+    $data{ 'reload' } = $output;
+    die "reload failed" unless $res;
+  }
 
   $data{ 'result' } = 'success';
 } catch {
