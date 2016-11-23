@@ -55,7 +55,7 @@ RUN set -xe \
     && for mod in $HTTPD_ENMOD; do a2enmod $mod; done \
     && for conf in $HTTPD_DISCONF; do a2disconf $conf; done \
     && for conf in $HTTPD_ENCONF; do a2enconf $conf; done \
-    && a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-management \
+    && a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-agent \
     && chmod a+rx /usr/local/bin/pie-entrypoint.sh
 
 ENV PIE_EXP_MEMORY_SIZE 30
