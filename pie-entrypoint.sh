@@ -64,19 +64,21 @@ apache_envset () {
   fi
 
   . $APACHE_ENVVARS
-
-  rm -f "$APACHE_PID_FILE"
 }
 
 if [[ "$1" == "apache2-pie" ]]; then
   shift
 
   apache_envset
+
+  rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND -DPIE "$@"
 elif [[ "$1" == "apache2" ]]; then
   shift
 
   apache_envset
+
+  rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND "$@"
 elif [[ "$1" == "apache2"* ]]; then
   apache_envset
