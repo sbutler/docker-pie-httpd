@@ -64,6 +64,8 @@ apache_envset () {
   fi
 
   . $APACHE_ENVVARS
+  export APACHE_RUN_USER=pie-www-data
+  export APACHE_RUN_GROUP=pie-www-data
 }
 
 if [[ "$1" == "apache2-pie" ]]; then

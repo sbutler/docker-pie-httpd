@@ -1,5 +1,8 @@
 FROM sbutler/pie-base
 
+ARG HTTPD_UID=8001
+ARG HTTPD_GID=8001
+
 ARG HTTPD_DISMOD="\
     mpm_event \
     "
@@ -51,6 +54,8 @@ COPY opt/ /opt
 COPY pie-entrypoint.sh /usr/local/bin/
 
 RUN set -xe \
+    && groupadd -r -g $HTTPD_GID pie-www-data \
+    && useradd -N -r -g pie-www-data -s /usr/sbin/nologin -u $HTTPD_UID pie-www-data \
     && for mod in $HTTPD_DISMOD; do a2dismod $mod; done \
     && for mod in $HTTPD_ENMOD; do a2enmod $mod; done \
     && for conf in $HTTPD_DISCONF; do a2disconf $conf; done \
