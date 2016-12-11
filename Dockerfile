@@ -5,6 +5,7 @@ ARG HTTPD_GID=8001
 
 ARG HTTPD_DISMOD="\
     mpm_event \
+    status \
     "
 
 ARG HTTPD_ENMOD="\
