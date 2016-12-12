@@ -66,12 +66,15 @@ apache_envset () {
   . $APACHE_ENVVARS
   export APACHE_RUN_USER=pie-www-data
   export APACHE_RUN_GROUP=pie-www-data
+
+  touch "/etc/apache2/trusted-proxies.list"
 }
 
 if [[ "$1" == "apache2-pie" ]]; then
   shift
 
   apache_envset
+  pie-trustedproxies.sh || true 1>&2
 
   rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND -DPIE "$@"
@@ -79,6 +82,7 @@ elif [[ "$1" == "apache2" ]]; then
   shift
 
   apache_envset
+  pie-trustedproxies.sh || true 1>&2
 
   rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND "$@"

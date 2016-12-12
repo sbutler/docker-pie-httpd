@@ -16,6 +16,17 @@ my %data = (
 try {
   my ($output, $res);
 
+  if ($cgi->request_method eq 'POST') {
+    $res = run [qw#sudo pie-trustedproxies.sh#], '>&', \$output, timeout( 60 );
+    if ($output) {
+      $data{ 'trustedproxies' } = $output;
+    } elsif ($res) {
+      $data{ 'trustedproxies' } = 'update succeeded';
+    } else {
+      $data{ 'trustedproxies' } = 'update failed';
+    }
+  }
+
   $res = run [qw#sudo pie-entrypoint.sh apache2ctl configtest#], '>&', \$output, timeout( 60 );
   $data{ 'configtest' } = $output;
   die "configtest failed" unless $res;
