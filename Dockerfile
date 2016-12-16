@@ -24,6 +24,7 @@ ARG HTTPD_ENMOD="\
     pie-mpm-event \
     pie-info \
     pie-status \
+    unique_id \
     "
 
 ARG HTTPD_DISCONF="\
