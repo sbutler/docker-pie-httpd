@@ -71,9 +71,14 @@ ARG HTTPD_ENCONF="\
     pie-error-pages \
     "
 
+COPY apache2-debs/*.deb /tmp/apache2-debs/
+
 RUN set -xe \
-    && apt-get update && apt-get install -y \
-        apache2 \
+    && cd /tmp/apache2-debs \
+    && dpkg -i apache2_*.deb apache2-bin_*.deb apache2-data_*.deb apache2-utils_*.deb || /bin/true \
+    && apt-get update && apt-get install -y -f --no-install-recommends \
+    && dpkg -i apache2_*.deb apache2-bin_*.deb apache2-data_*.deb apache2-utils_*.deb \
+    && apt-get install -y \
         libapache2-mod-shib2 \
         libapache2-mod-xsendfile \
         python2.7 \
@@ -81,7 +86,8 @@ RUN set -xe \
         curl \
         jq \
         --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -fr /tmp/apache2-debs
 
 COPY etc/ /etc
 COPY opt/ /opt
