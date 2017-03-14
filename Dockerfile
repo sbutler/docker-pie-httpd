@@ -116,6 +116,8 @@ ENV APACHE_REMOTEIP_HEADER                X-Forwarded-For
 ENV PHP_FPM_HOSTNAME  pie-php.local
 ENV PHP_FPM_PORT      9000
 
+ENV SHIBD_CONFIG_SUFFIX ""
+
 VOLUME /etc/apache2/sites-pie
 VOLUME /etc/opt/pie/apache2
 VOLUME /etc/opt/pie/ssl
