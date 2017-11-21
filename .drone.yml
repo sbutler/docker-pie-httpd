@@ -1,0 +1,26 @@
+pipeline:
+    debuild-apache2:
+        image: docker:1.13-dind
+        environment:
+            - DOCKER_HOST=tcp://127.0.0.1:2375
+        commands:
+            - docker version
+            - docker info
+            - docker system prune -f
+            - docker build --rm=true --tag debuild-apache2:latest -f Dockerfile.debuild-apache2 .
+            - docker run --rm -v $(pwd)/apache2-debs:/output debuild-apache2
+            - ls -al ./apache2-debs
+
+    build:
+        image: docker:1.13-dind
+        environment:
+            - DOCKER_HOST=tcp://127.0.0.1:2375
+        commands:
+            - docker system prune -f
+            - docker build --rm=true --tag sbutler/pie-httpd:latest .
+
+services:
+    docker:
+        image: docker:1.13-dind
+        privileged: true
+        command: [ "--storage-driver=vfs", "--tls=false" ]
