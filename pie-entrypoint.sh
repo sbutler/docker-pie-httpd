@@ -110,7 +110,10 @@ if [[ "$1" == "apache2-pie" ]]; then
   shift
 
   apache_envset
-  pie-trustedproxies.sh || true 1>&2
+  set +e
+  pie-trustedproxies.sh 1>&2
+  pie-aws-metrics.sh 1>&2 &
+  set -e
 
   rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND -DPIE "$@"
@@ -118,7 +121,10 @@ elif [[ "$1" == "apache2" ]]; then
   shift
 
   apache_envset
-  pie-trustedproxies.sh || true 1>&2
+  set +e
+  pie-trustedproxies.sh 1>&2
+  pie-aws-metrics.sh 1>&2 &
+  set -e
 
   rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND "$@"

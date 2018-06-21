@@ -84,13 +84,13 @@ RUN set -xe \
         python2.7 \
         unzip \
         curl \
-        jq \
         --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && rm -fr /tmp/apache2-debs
 
 COPY etc/ /etc
 COPY opt/ /opt
+COPY pie-aws-metrics.sh /usr/local/bin/
 COPY pie-entrypoint.sh /usr/local/bin/
 COPY pie-trustedproxies.sh /usr/local/bin/
 
@@ -102,6 +102,7 @@ RUN set -xe \
     && for conf in $HTTPD_DISCONF; do a2disconf $conf; done \
     && for conf in $HTTPD_ENCONF; do a2enconf $conf; done \
     && a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-agent \
+    && chmod a+rx /usr/local/bin/pie-aws-metrics.sh \
     && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
     && chmod a+rx /usr/local/bin/pie-trustedproxies.sh
 
