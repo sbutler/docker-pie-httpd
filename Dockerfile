@@ -29,6 +29,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 # THE SOFTWARE.
+FROM sbutler/pie-base AS builder
+
+RUN set -xe \
+    && cp /etc/apt/sources.list /etc/apt/sources.list.orig \
+    && sed -re 's/^deb[[:space:]]+(.+)$/deb-src \1/' < /etc/apt/sources.list.orig >> /etc/apt/sources.list \
+    && rm /etc/apt/sources.list.orig \
+    && apt-get update && apt-get install -y \
+        build-essential \
+        fakeroot \
+        devscripts \
+        apache2 \
+        --no-install-recommends \
+    && mkdir -p /usr/src/patches /usr/src/debian /output
+
+COPY apache2-*.patch /usr/src/patches
+
+WORKDIR /usr/src/debian
+RUN set -xe \
+    && apt-get source -y apache2 \
+    && apt-get build-dep -y apache2 \
+    && cd "$(find . -maxdepth 1 -type d -name apache2-*)" \
+    && cp /usr/src/patches/apache2-*.patch debian/patches/ \
+    && (cd /usr/src/patches && ls -1 apache2-*.patch) >> debian/patches/series \
+    && debuild -b -uc -us \
+    && cd /usr/src/debian \
+    && cp *.deb /output/ \
+    && rm -rf /var/lib/apt/lists/*
+
+
 FROM sbutler/pie-base
 
 ARG HTTPD_UID=8001
@@ -71,7 +100,7 @@ ARG HTTPD_ENCONF="\
     pie-error-pages \
     "
 
-COPY apache2-debs/*.deb /tmp/apache2-debs/
+COPY --from=builder /output/*.deb /tmp/apache2-debs/
 
 RUN set -xe \
     && cd /tmp/apache2-debs \
