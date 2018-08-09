@@ -26,8 +26,9 @@ class ApacheServer(object):
     """ Gathers and tracks the status of an Apache host. """
     def __init__(self, name='default', status_urlpath='/status'):
         self._name = name
-        self._uptime = 0
+        self._uptime = -1
         self._status_urlpath = status_urlpath
+        self._status_prev = defaultdict(lambda: 0)
 
     def __str__(self):
         return self._name
@@ -42,7 +43,8 @@ class ApacheServer(object):
         r.raise_for_status()
 
         result = {}
-        for line in r.iter_lines():
+        r.encoding = 'ISO-8859-1'
+        for line in r.text.splitlines():
             m = APACHE_STATUSLINE_RE.match(line.strip())
             if not m:
                 continue

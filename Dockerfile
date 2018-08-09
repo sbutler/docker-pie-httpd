@@ -134,7 +134,7 @@ RUN set -xe \
     && for conf in $HTTPD_DISCONF; do a2disconf $conf; done \
     && for conf in $HTTPD_ENCONF; do a2enconf $conf; done \
     && a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-agent \
-    && chmod a+rx /usr/local/bin/pie-aws-metrics.sh \
+    && chmod a+rx /usr/local/bin/pie-aws-metrics.py \
     && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
     && chmod a+rx /usr/local/bin/pie-trustedproxies.sh
 

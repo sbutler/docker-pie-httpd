@@ -41,6 +41,6 @@ do_cleanup () {
 trap do_cleanup EXIT
 
 OUTPUT_FILE=$(mktemp); TMP_FILES+=("$OUTPUT_FILE")
-curl --silent --remote-time -o "$OUTPUT_FILE" "${APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL:-$1}"
-
-cp "$OUTPUT_FILE" "$LIST_FILE"
+if curl --silent --fail --remote-time -o "$OUTPUT_FILE" "${APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL:-$1}"; then
+    cp "$OUTPUT_FILE" "$LIST_FILE"
+fi
