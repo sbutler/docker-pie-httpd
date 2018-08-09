@@ -112,7 +112,9 @@ if [[ "$1" == "apache2-pie" ]]; then
   apache_envset
   set +e
   pie-trustedproxies.sh 1>&2
-  pie-aws-metrics.py 1>&2 &
+  if [[ -n $APACHE_AWS_METRICS_LOGGROUP_NAME ]]; then
+    setsid pie-aws-metrics.py 1>&2 &
+  fi
   set -e
 
   rm -f "$APACHE_PID_FILE"
@@ -123,7 +125,9 @@ elif [[ "$1" == "apache2" ]]; then
   apache_envset
   set +e
   pie-trustedproxies.sh 1>&2
-  pie-aws-metrics.py 1>&2 &
+  if [[ -n $APACHE_AWS_METRICS_LOGGROUP_NAME ]]; then
+    setsid pie-aws-metrics.py 1>&2 &
+  fi
   set -e
 
   rm -f "$APACHE_PID_FILE"
