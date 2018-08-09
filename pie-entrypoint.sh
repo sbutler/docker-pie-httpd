@@ -112,7 +112,7 @@ if [[ "$1" == "apache2-pie" ]]; then
   apache_envset
   set +e
   pie-trustedproxies.sh 1>&2
-  pie-aws-metrics.sh 1>&2 &
+  pie-aws-metrics.py 1>&2 &
   set -e
 
   rm -f "$APACHE_PID_FILE"
@@ -123,7 +123,7 @@ elif [[ "$1" == "apache2" ]]; then
   apache_envset
   set +e
   pie-trustedproxies.sh 1>&2
-  pie-aws-metrics.sh 1>&2 &
+  pie-aws-metrics.py 1>&2 &
   set -e
 
   rm -f "$APACHE_PID_FILE"

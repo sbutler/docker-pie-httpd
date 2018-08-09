@@ -1,4 +1,8 @@
-Defaults!/usr/local/bin/pie-entrypoint.sh     env_keep += "PIE_EXP_MEMORY_SIZE PIE_RES_MEMORY_SIZE APACHE_SERVER_ADMIN APACHE_ADMIN_SUBNET APACHE_REMOTEIP_HEADER PHP_FPM_HOSTNAME PHP_FPM_PORT SHIBD_CONFIG_SUFFIX"
+Defaults!/usr/local/bin/pie-entrypoint.sh     env_keep += "PIE_EXP_MEMORY_SIZE PIE_RES_MEMORY_SIZE"
+Defaults!/usr/local/bin/pie-entrypoint.sh     env_keep += "APACHE_SERVER_ADMIN APACHE_ADMIN_SUBNET APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL APACHE_REMOTEIP_HEADER"
+Defaults!/usr/local/bin/pie-entrypoint.sh     env_keep += "PHP_FPM_HOSTNAME PHP_FPM_PORT"
+Defaults!/usr/local/bin/pie-entrypoint.sh     env_keep += "SHIBD_CONFIG_SUFFIX"
 Defaults!/usr/local/bin/pie-trustedproxies.sh env_keep += "APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL"
+Defaults:pie-www-data                         !requiretty
 
 pie-www-data    ALL = NOPASSWD: /usr/local/bin/pie-trustedproxies.sh, /usr/local/bin/pie-entrypoint.sh apache2ctl configtest, /bin/kill -USR1 1

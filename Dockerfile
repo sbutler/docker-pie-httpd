@@ -111,6 +111,7 @@ RUN set -xe \
         libapache2-mod-shib2 \
         libapache2-mod-xsendfile \
         python2.7 \
+        python3 python3-pip python3-botocore python3-jmespath python3-requests \
         unzip \
         curl \
         --no-install-recommends \
@@ -119,9 +120,11 @@ RUN set -xe \
 
 COPY etc/ /etc
 COPY opt/ /opt
-COPY pie-aws-metrics.sh /usr/local/bin/
 COPY pie-entrypoint.sh /usr/local/bin/
 COPY pie-trustedproxies.sh /usr/local/bin/
+
+COPY pie-aws-metrics.py /usr/local/bin/
+RUN pip3 install boto3
 
 RUN set -xe \
     && groupadd -r -g $HTTPD_GID pie-www-data \
@@ -135,16 +138,16 @@ RUN set -xe \
     && chmod a+rx /usr/local/bin/pie-entrypoint.sh \
     && chmod a+rx /usr/local/bin/pie-trustedproxies.sh
 
-ENV PIE_EXP_MEMORY_SIZE 30
-ENV PIE_RES_MEMORY_SIZE 50
+ENV PIE_EXP_MEMORY_SIZE=30 \
+    PIE_RES_MEMORY_SIZE=50
 
-ENV APACHE_SERVER_ADMIN                   webmaster@example.org
-ENV APACHE_ADMIN_SUBNET                   10.0.0.0/8
-ENV APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL  https://s3.amazonaws.com/deploy-publish-illinois-edu/cloudfront-trustedproxylist.txt
-ENV APACHE_REMOTEIP_HEADER                X-Forwarded-For
+ENV APACHE_SERVER_ADMIN=webmaster@example.org \
+    APACHE_ADMIN_SUBNET=10.0.0.0/8 \
+    APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL="https://s3.amazonaws.com/deploy-publish-illinois-edu/cloudfront-trustedproxylist.txt" \
+    APACHE_REMOTEIP_HEADER=X-Forwarded-For
 
-ENV PHP_FPM_HOSTNAME  pie-php.local
-ENV PHP_FPM_PORT      9000
+ENV PHP_FPM_HOSTNAME=pie-php.local \
+    PHP_FPM_PORT=9000
 
 ENV SHIBD_CONFIG_SUFFIX ""
 
