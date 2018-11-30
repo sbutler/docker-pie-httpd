@@ -29,7 +29,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 # THE SOFTWARE.
-FROM sbutler/pie-base
+FROM sbutler/pie-base:latest-ubuntu18.04
 
 ARG HTTPD_UID=8001
 ARG HTTPD_GID=8001
@@ -76,11 +76,10 @@ COPY SWITCHaai-swdistrib.list /tmp/
 
 RUN set -xe \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get update \
-    && apt-get install -y gnupg --no-install-recommends \
+    && apt-get update && apt-get install -y --no-install-recommends gnupg  \
     && apt-key add /tmp/SWITCHaai-swdistrib.asc && rm /tmp/SWITCHaai-swdistrib.asc \
     && mv /tmp/SWITCHaai-swdistrib.list /etc/apt/sources.list.d/ \
-    && apt-get update && apt-get install -y \
+    && apt-get update && apt-get install -y --no-install-recommends \
         apache2 \
         curl \
         libapache2-mod-shib \
@@ -91,7 +90,6 @@ RUN set -xe \
         python3-jmespath \
         python3-requests \
         unzip \
-        --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY etc/ /etc
@@ -100,7 +98,7 @@ COPY pie-entrypoint.sh /usr/local/bin/
 COPY pie-trustedproxies.sh /usr/local/bin/
 
 COPY pie-aws-metrics.py /usr/local/bin/
-RUN pip3 install boto3
+RUN pip3 install --no-cache-dir boto3
 
 RUN groupadd -r -g $HTTPD_GID pie-www-data
 RUN useradd -N -r -g pie-www-data -s /usr/sbin/nologin -u $HTTPD_UID pie-www-data
@@ -128,8 +126,7 @@ ENV PHP_FPM_SOCKET "/run/php/php7.2-fpm.sock"
 ENV SHIBD_CONFIG_SUFFIX ""
 
 VOLUME /etc/apache2/sites-pie
-VOLUME /etc/opt/pie/apache2
-VOLUME /etc/opt/pie/ssl
+VOLUME /etc/opt/pie/apache2 /etc/opt/pie/ssl
 VOLUME /var/www
 
 EXPOSE 80 8080
