@@ -90,6 +90,7 @@ RUN set -xe \
         python3-jmespath \
         python3-requests \
         unzip \
+    && rm -fr /etc/shibboleth/* \
     && rm -rf /var/lib/apt/lists/*
 
 COPY etc/ /etc
