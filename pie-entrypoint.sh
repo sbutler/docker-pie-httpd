@@ -107,11 +107,12 @@ apache_envset () {
 }
 
 apache_loginit () {
+  echoerr "APACHE_LOGGING=${APACHE_LOGGING}"
   for f in /var/log/apache2/{access,ssl_request}.log /var/log/shibboleth-www/native.log; do
     case "$APACHE_LOGGING" in
       pipe)
         [[ -e $f ]] && rm -- "$f"
-        mkfifo -m 0600 "$f"
+        mkfifo -m 0640 "$f"
         if [[ $f == *"/shibboleth-www/"* ]]; then
           chown $APACHE_RUN_USER:$APACHE_RUN_GROUP "$f"
         else
@@ -120,7 +121,14 @@ apache_loginit () {
         ;;
 
       file)
-        [[ ! -f $f ]] && rm -- "$f"
+        [[ -e $f && (! -f $f) ]] && rm -- "$f"
+        touch "$f"
+        chmod 0640 "$f"
+        if [[ $f == *"/shibboleth-www/"* ]]; then
+          chown $APACHE_RUN_USER:$APACHE_RUN_GROUP "$f"
+        else
+          chown root:adm "$f"
+        fi
         ;;
 
       *)
