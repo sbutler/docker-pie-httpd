@@ -1,0 +1,18 @@
+/var/log/apache2/*.log {
+    missingok
+    compress
+    delaycompress
+    notifempty
+    create 640 root adm
+    sharedscripts
+    postrotate
+        kill -USR1 1
+    endscript
+    prerotate
+        for f in "$1"; do \
+            if [ -L "$f" -o ! -f "$f" ]; then \
+                exit 1; \
+            fi; \
+        done;
+    endscript
+}
