@@ -91,6 +91,8 @@ RUN set -xe \
         python3-requests \
         unzip \
     && rm -fr /etc/shibboleth/* \
+    && rm -fr /var/log/shibboleth/* \
+    && rm -fr /var/log/apache2/* \
     && rm -rf /var/lib/apt/lists/*
 
 COPY etc/ /etc
@@ -109,6 +111,8 @@ RUN for mod in $HTTPD_ENMOD; do a2enmod $mod; done
 RUN for conf in $HTTPD_DISCONF; do a2disconf $conf; done
 RUN for conf in $HTTPD_ENCONF; do a2enconf $conf; done
 RUN a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-agent
+RUN mkdir -m 0750 /var/log/shibboleth-www
+RUN chown pie-www-data:pie-www-data /var/log/shibboleth-www
 
 RUN chmod a+rx /usr/local/bin/pie-aws-metrics.py
 RUN chmod a+rx /usr/local/bin/pie-entrypoint.sh
@@ -120,7 +124,8 @@ ENV PIE_EXP_MEMORY_SIZE=30 \
 ENV APACHE_SERVER_ADMIN=webmaster@example.org \
     APACHE_ADMIN_SUBNET=10.0.0.0/8 \
     APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL="https://s3.amazonaws.com/deploy-publish-illinois-edu/cloudfront-trustedproxylist.txt" \
-    APACHE_REMOTEIP_HEADER=X-Forwarded-For
+    APACHE_REMOTEIP_HEADER=X-Forwarded-For \
+    APACHE_LOGGING=""
 
 ENV PHP_FPM_SOCKET "/run/php/php7.2-fpm.sock"
 
@@ -129,6 +134,7 @@ ENV SHIBD_CONFIG_SUFFIX ""
 VOLUME /etc/apache2/sites-pie
 VOLUME /etc/opt/pie/apache2 /etc/opt/pie/ssl
 VOLUME /var/www
+VOLUME /var/log/apache2 /var/log/shibboleth-www
 
 EXPOSE 80 8080
 EXPOSE 443 8443

@@ -106,10 +106,36 @@ apache_envset () {
   touch "/etc/apache2/trusted-proxies.list"
 }
 
+apache_loginit () {
+  for f in /var/log/apache2/{access,ssl_request}.log /var/log/shibboleth-www/native.log; do
+    case "$APACHE_LOGGING" in
+      pipe)
+        [[ -e $f ]] && rm -- "$f"
+        mkfifo -m 0600 "$f"
+        if [[ $f == *"/shibboleth-www/"* ]]; then
+          chown $APACHE_RUN_USER:$APACHE_RUN_GROUP "$f"
+        else
+          chown root:adm "$f"
+        fi
+        ;;
+
+      file)
+        [[ ! -f $f ]] && rm -- "$f"
+        ;;
+
+      *)
+        [[ -e $f ]] && rm -- "$f"
+        ln -s /proc/self/fd/2 "$f"
+        ;;
+    esac
+  done
+}
+
 if [[ "$1" == "apache2-pie" ]]; then
   shift
 
   apache_envset
+  apache_loginit
   set +e
   pie-trustedproxies.sh 1>&2
   if [[ -n $APACHE_AWS_METRICS_LOGGROUP_NAME ]]; then
@@ -123,6 +149,7 @@ elif [[ "$1" == "apache2" ]]; then
   shift
 
   apache_envset
+  apache_loginit
   set +e
   pie-trustedproxies.sh 1>&2
   if [[ -n $APACHE_AWS_METRICS_LOGGROUP_NAME ]]; then
