@@ -111,8 +111,14 @@ apache_loginit () {
   for f in /var/log/apache2/{access,ssl_request}.log /var/log/shibboleth-www/native.log; do
     case "$APACHE_LOGGING" in
       pipe)
-        [[ -e $f ]] && rm -- "$f"
-        mkfifo -m 0640 "$f"
+        [[ -e $f && ! -p $f ]] && rm -- "$f"
+
+        if [[ ! -e $f ]]; then
+            mkfifo -m 0640 "$f"
+        else
+            chmod 0640 "$f"
+        fi
+
         if [[ $f == *"/shibboleth-www/"* ]]; then
           chown $APACHE_RUN_USER:$APACHE_RUN_GROUP "$f"
         else
@@ -121,7 +127,7 @@ apache_loginit () {
         ;;
 
       file)
-        [[ -e $f && (! -f $f) ]] && rm -- "$f"
+        [[ -e $f && ! -f $f ]] && rm -- "$f"
         touch "$f"
         chmod 0640 "$f"
         if [[ $f == *"/shibboleth-www/"* ]]; then
@@ -132,8 +138,11 @@ apache_loginit () {
         ;;
 
       *)
-        [[ -e $f ]] && rm -- "$f"
-        ln -s /proc/self/fd/2 "$f"
+        [[ -e $f && ! -L $f ]] && rm -- "$f"
+
+        if [[ ! -e $f ]]; then
+            ln -s /proc/self/fd/2 "$f"
+        fi
         ;;
     esac
   done
