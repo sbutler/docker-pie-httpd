@@ -127,7 +127,7 @@ ENV APACHE_SERVER_ADMIN=webmaster@example.org \
     APACHE_REMOTEIP_HEADER=X-Forwarded-For \
     APACHE_LOGGING=""
 
-ENV PHP_FPM_SOCKET "/run/php/php7.2-fpm.sock"
+ENV PHP_FPM_SOCKET "/run/php-fpm.sock.d/default.sock"
 
 ENV SHIBD_CONFIG_SUFFIX ""
 
