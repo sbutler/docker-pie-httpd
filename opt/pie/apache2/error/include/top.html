@@ -3,23 +3,27 @@
 --><!--#endif
 --><!DOCTYPE html>
 <html lang="<!--#echo var="CONTENT_LANGUAGE" -->">
-  <head>
-    <title><!--#echo encoding="none" var="TITLE" --></title>
-    <link rel="stylesheet" type="text/css" href='https://fonts.googleapis.com/css?family=Montserrat:400,700'>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title><!--#echo encoding="none" var="REDIRECT_STATUS" -->: <!--#echo encoding="none" var="TITLE" --> - University of Illinois</title>
     <link rel="stylesheet" type="text/css" href="/error/stylesheets/normalize.css">
     <link rel="stylesheet" type="text/css" href="/error/stylesheets/base.css">
 
     <link rev="made" href="mailto:<!--#echo encoding="url" var="SERVER_ADMIN" -->">
-  </head>
-  <body>
-    <header>
-      <div id="logo" class="container">
-        <img id="imark" src="/error/images/imark.png" srcset="/error/images/imark@2x.png 2x, /error/images/imark@3x.png 3x" alt="University of Illinois">
-        <img id="ilogo" src="/error/images/ilogo.png" srcset="/error/images/ilogo@2x.png 2x, /error/images/ilogo@3x.png 3x" alt="University of Illinois">
-      </div>
+</head>
+<body>
+    <header role="banner">
+        <picture id="logo">
+            <source media="(min-width: 783px)" srcset="/error/images/wordmark.png, /error/images/wordmark@2x.png 2x, /error/images/wordmark@3x.png 3x">
+            <img src="/error/images/logo.png" srcset="/error/images/logo.png, /error/images/logo@2x.png 2x, /error/images/logo@3x.png 3x" alt="University of Illinois">
+        </picture>
     </header>
-    <main role="main">
-      <div class="container">
-        <h1><!--#echo encoding="none" var="TITLE" --></h1>
+
+    <main id="main" role="main">
+        <h1><!--#echo encoding="none" var="REDIRECT_STATUS" -->: <!--#echo encoding="none" var="TITLE" --></h1>
         <section id="message">
-          <p>
+            <p>

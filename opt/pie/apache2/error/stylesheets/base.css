@@ -1,52 +1,57 @@
-header {
-  background: #FA6300;
+html, body {
+    margin: 0px;
+    padding: 0px;
 }
 
-.container {
-  padding: 16px;
-}
-
-#imark {
-  display: block;
-  margin: 0 auto;
-}
-
-#ilogo {
-  display: none;
-}
-
-main {
-  background: white;
-  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
-}
-
-main h1 {
-  color: #263b54;
-}
-
-footer {
-  color: #777;
-}
-
-footer a, footer a:visited, footer a:active, footer a:hover {
-  color: #777;
-  text-decoration: none;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
-footer #status-code, footer address {
-  display: inline;
-}
-
-@media (min-width: 500px) {
-  #imark {
-    display: none;
-  }
-
-  #ilogo {
+/* IE11 fixes */
+header, main, footer {
     display: block;
-  }
+}
+
+header {
+    background-color: #13294B;
+}
+
+#logo {
+    display: block;
+    height: 100px;
+    width: 69px;
+
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+#main, #footer {
+    max-width: 583px;
+    margin: 20px auto;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    color: #555;
+    font-size: 1.5em;
+}
+
+#footer {
+    margin-top: 3em;
+}
+
+#main h1 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    color: #E84A27;
+    font-size: 2em;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+#footer p {
+    font-style: italic;
+}
+
+@media (min-width: 783px) {
+    #logo {
+        width: 583px;
+    }
 }
