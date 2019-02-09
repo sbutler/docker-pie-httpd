@@ -108,6 +108,10 @@ apache_envset () {
 
 apache_loginit () {
   echoerr "APACHE_LOGGING=${APACHE_LOGGING}"
+
+  chown $APACHE_RUN_USER:$APACHE_RUN_GROUP /var/log/shibboleth-www
+  chmod 0750 /var/log/shibboleth-www
+
   for f in /var/log/apache2/{access,ssl_request}.log /var/log/shibboleth-www/native.log; do
     case "$APACHE_LOGGING" in
       pipe)
