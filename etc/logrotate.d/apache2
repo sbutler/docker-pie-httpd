@@ -9,10 +9,10 @@
         kill -USR1 1
     endscript
     prerotate
-        for f in "$1"; do \
-            if [ -L "$f" -o ! -f "$f" ]; then \
-                exit 1; \
-            fi; \
-        done;
+        for f in /var/log/apache2/*.log; do
+            if [ -L "$f" -o ! -f "$f" ]; then
+                exit 1
+            fi
+        done
     endscript
 }
