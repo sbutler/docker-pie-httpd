@@ -41,6 +41,7 @@ ARG HTTPD_DISMOD="\
 
 ARG HTTPD_ENMOD="\
     allowmethods \
+    authnz_ldap \
     cgi \
     expires \
     headers \
@@ -54,6 +55,7 @@ ARG HTTPD_ENMOD="\
     ssl \
     pie-mpm-event \
     pie-info \
+    pie-ldap \
     pie-status \
     unique_id \
     "
