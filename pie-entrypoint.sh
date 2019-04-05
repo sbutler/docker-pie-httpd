@@ -35,6 +35,14 @@ set -e
 echoerr () { echo "$@" 1>&2; }
 
 apache_envset () {
+  echoerr "APACHE_CACHE_LOCK: ${APACHE_CACHE_LOCK:=on}"
+  echoerr "APACHE_CACHE_QUICK_HANDLER: ${APACHE_CACHE_QUICK_HANDLER:=off}"
+  echoerr "APACHE_CACHE_DEFAULT: ${APACHE_CACHE_DEFAULT:=3600}"
+  echoerr "APACHE_CACHE_MIN: ${APACHE_CACHE_MIN:=0}"
+  echoerr "APACHE_CACHE_MAX: ${APACHE_CACHE_MAX:=86400}"
+  echoerr "APACHE_CACHE_LIMIT: ${APACHE_CACHE_LIMIT}"
+  export APACHE_CACHE_LOCK APACHE_CACHE_QUICK_HANDLER APACHE_CACHE_DEFAULT APACHE_CACHE_MIN APACHE_CACHE_MAX APACHE_CACHE_LIMIT
+
   echoerr "APACHE_SERVER_LIMIT (provided): ${APACHE_SERVER_LIMIT:=0}"
 
   if (( APACHE_SERVER_LIMIT <= 0 )); then
@@ -106,6 +114,16 @@ apache_envset () {
   touch "/etc/apache2/trusted-proxies.list"
 }
 
+apache_cacheinit () {
+    chown $APACHE_RUN_USER:$APACHE_RUN_GROUP /var/cache/apache2/mod_cache_disk
+
+    if [[ -n $APACHE_CACHE_LIMIT ]]; then
+        set +e
+        htcacheclean -n -i -d60 -p/var/cache/apache2/mod_cache_disk -l${APACHE_CACHE_LIMIT}
+        set -e
+    fi
+}
+
 apache_loginit () {
   echoerr "APACHE_LOGGING=${APACHE_LOGGING}"
 
@@ -156,6 +174,7 @@ if [[ "$1" == "apache2-pie" ]]; then
   shift
 
   apache_envset
+  apache_cacheinit
   apache_loginit
   set +e
   pie-trustedproxies.sh 1>&2
@@ -170,6 +189,7 @@ elif [[ "$1" == "apache2" ]]; then
   shift
 
   apache_envset
+  apache_cacheinit
   apache_loginit
   set +e
   pie-trustedproxies.sh 1>&2

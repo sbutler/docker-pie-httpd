@@ -1,0 +1,3 @@
+<IfDefine SHIB>
+LoadModule mod_shib /usr/lib/apache2/modules/mod_shib.so
+</IfDefine>

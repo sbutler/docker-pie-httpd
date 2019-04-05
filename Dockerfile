@@ -36,12 +36,16 @@ ARG HTTPD_GID=8001
 
 ARG HTTPD_DISMOD="\
     mpm_event \
+    shib \
     status \
     "
 
 ARG HTTPD_ENMOD="\
     allowmethods \
     authnz_ldap \
+    cache \
+    cache_disk \
+    cache_socache \
     cgi \
     expires \
     headers \
@@ -49,13 +53,17 @@ ARG HTTPD_ENMOD="\
     macro \
     proxy \
     proxy_fcgi \
+    proxy_http \
     remoteip \
     reqtimeout \
     rewrite \
     ssl \
+    socache_memcache \
+    socache_shmcb \
     pie-mpm-event \
     pie-info \
     pie-ldap \
+    pie-shib \
     pie-status \
     unique_id \
     "
@@ -64,13 +72,16 @@ ARG HTTPD_DISCONF="\
     other-vhosts-access-log \
     serve-cgi-bin \
     localized-error-pages \
+    shib \
     "
 
 ARG HTTPD_ENCONF="\
+    pie-cache \
     pie-security \
     pie-logs \
     pie-remoteip \
     pie-error-pages \
+    pie-shib \
     "
 
 COPY SWITCHaai-swdistrib.asc /tmp/
@@ -101,6 +112,7 @@ COPY etc/ /etc
 COPY opt/ /opt
 COPY pie-entrypoint.sh /usr/local/bin/
 COPY pie-trustedproxies.sh /usr/local/bin/
+COPY pie-htcacheclean.sh /usr/local/bin
 
 COPY pie-aws-metrics.py /usr/local/bin/
 RUN pip3 install --no-cache-dir boto3
@@ -112,13 +124,14 @@ RUN for mod in $HTTPD_DISMOD; do a2dismod $mod; done
 RUN for mod in $HTTPD_ENMOD; do a2enmod $mod; done
 RUN for conf in $HTTPD_DISCONF; do a2disconf $conf; done
 RUN for conf in $HTTPD_ENCONF; do a2enconf $conf; done
-RUN a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 999-pie-agent
+RUN a2ensite 001-pie-sites && a2ensite 000-default-ssl && a2ensite 000-proxydefault && a2ensite 000-proxydefault-ssl && a2ensite 999-pie-agent
 RUN mkdir -m 0750 /var/log/shibboleth-www
 RUN chown pie-www-data:pie-www-data /var/log/shibboleth-www
 
 RUN chmod a+rx /usr/local/bin/pie-aws-metrics.py
 RUN chmod a+rx /usr/local/bin/pie-entrypoint.sh
 RUN chmod a+rx /usr/local/bin/pie-trustedproxies.sh
+RUN chmod a+rx /usr/local/bin/pie-htcacheclean.sh
 
 ENV PIE_EXP_MEMORY_SIZE=30 \
     PIE_RES_MEMORY_SIZE=50
@@ -127,7 +140,13 @@ ENV APACHE_SERVER_ADMIN=webmaster@example.org \
     APACHE_ADMIN_SUBNET=10.0.0.0/8 \
     APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL="https://s3.amazonaws.com/deploy-publish-illinois-edu/cloudfront-trustedproxylist.txt" \
     APACHE_REMOTEIP_HEADER=X-Forwarded-For \
-    APACHE_LOGGING=""
+    APACHE_LOGGING="" \
+    APACHE_CACHE_LOCK=on \
+    APACHE_CACHE_QUICK_HANDLER=off \
+    APACHE_CACHE_DEFAULT=3600 \
+    APACHE_CACHE_MIN=0 \
+    APACHE_CACHE_MAX=86400 \
+    APACHE_CACHE_LIMIT=""
 
 ENV PHP_FPM_SOCKET "/run/php-fpm.sock.d/default.sock"
 
@@ -137,6 +156,7 @@ VOLUME /etc/apache2/sites-pie
 VOLUME /etc/opt/pie/apache2 /etc/opt/pie/ssl
 VOLUME /var/www
 VOLUME /var/log/apache2 /var/log/shibboleth-www
+VOLUME /var/cache/apache2/mod_cache_disk
 
 EXPOSE 80 8080
 EXPOSE 443 8443
