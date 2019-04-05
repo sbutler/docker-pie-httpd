@@ -112,7 +112,8 @@ COPY etc/ /etc
 COPY opt/ /opt
 COPY pie-entrypoint.sh /usr/local/bin/
 COPY pie-trustedproxies.sh /usr/local/bin/
-COPY pie-htcacheclean.sh /usr/local/bin
+COPY pie-htcacheclean.sh /usr/local/bin/
+COPY pie-configtest.sh /usr/local/bin/
 
 COPY pie-aws-metrics.py /usr/local/bin/
 RUN pip3 install --no-cache-dir boto3
@@ -132,6 +133,7 @@ RUN chmod a+rx /usr/local/bin/pie-aws-metrics.py
 RUN chmod a+rx /usr/local/bin/pie-entrypoint.sh
 RUN chmod a+rx /usr/local/bin/pie-trustedproxies.sh
 RUN chmod a+rx /usr/local/bin/pie-htcacheclean.sh
+RUN chmod a+rx /usr/local/bin/pie-configtest.sh
 
 ENV PIE_EXP_MEMORY_SIZE=30 \
     PIE_RES_MEMORY_SIZE=50

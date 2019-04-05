@@ -108,6 +108,8 @@ apache_envset () {
   fi
 
   . $APACHE_ENVVARS
+  echoerr "APACHE_PID_FILE: ${APACHE_PID_FILE:=/var/run/apache2/apache2.pid}"
+  export APACHE_PID_FILE
   export APACHE_RUN_USER=pie-www-data
   export APACHE_RUN_GROUP=pie-www-data
 
@@ -200,7 +202,7 @@ elif [[ "$1" == "apache2" ]]; then
 
   rm -f "$APACHE_PID_FILE"
   exec apache2 -DFOREGROUND "$@"
-elif [[ "$1" == "apache2"* ]]; then
+elif [[ "$1" == "apache2"* || "$1" == "pie-configtest.sh" ]]; then
   apache_envset
   exec "$@"
 else

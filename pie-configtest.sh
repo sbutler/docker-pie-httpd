@@ -1,5 +1,5 @@
-#!/usr/bin/env perl
-# Copyright (c) 2017 University of Illinois Board of Trustees
+#!/bin/bash
+# Copyright (c) 2019 University of Illinois Board of Trustees
 # All rights reserved.
 #
 # Developed by: 		Technology Services
@@ -30,52 +30,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 # THE SOFTWARE.
+set -e
 
-use warnings;
-use strict;
+apache_defines=()
+if [[ -f $APACHE_PID_FILE ]]; then
+    apache_pid=$(cat "$APACHE_PID_FILE")
+    readarray -t apache_defines < <(cat /proc/$apache_pid/cmdline | tr '\0' '\n' | sed -rne '/^-D/p')
+fi
 
-use CGI;
-use IPC::Run qw/run timeout/;
-use JSON;
-use Try::Tiny;
-
-my $cgi = CGI->new;
-
-my %data = (
-  result    => 'unknown',
-);
-try {
-  my ($output, $res);
-
-  if ($cgi->request_method eq 'POST') {
-    $res = run [qw#sudo pie-trustedproxies.sh#], '>&', \$output, timeout( 60 );
-    if ($output) {
-      $data{ 'trustedproxies' } = $output;
-    } elsif ($res) {
-      $data{ 'trustedproxies' } = 'update succeeded';
-    } else {
-      $data{ 'trustedproxies' } = 'update failed';
-    }
-  }
-
-  $res = run [qw#sudo pie-entrypoint.sh pie-configtest.sh#], '>&', \$output, timeout( 60 );
-  $data{ 'configtest' } = $output;
-  die "configtest failed" unless $res;
-
-  if ($cgi->request_method eq 'POST') {
-    $res = run [qw#sudo kill -USR1 1#], '>&', \$output, timeout( 60 );
-    $data{ 'reload' } = $output;
-    die "reload failed" unless $res;
-  }
-
-  $data{ 'result' } = 'success';
-} catch {
-  $data{ 'result' } = 'error';
-  $data{ 'error' } = $_;
-};
-
-print $cgi->header(
-  -type       => 'application/json',
-  -status     => ($data{ 'result' } eq 'success' ? '200 OK' : '500 Internal Server Error'),
-);
-print encode_json( \%data );
+exec apache2ctl -t "${apache_defines[@]}"

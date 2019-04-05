@@ -64,7 +64,7 @@ try {
     }
   }
 
-  $res = run [qw#sudo pie-entrypoint.sh apache2ctl configtest#], '>&', \$output, timeout( 60 );
+  $res = run [qw#sudo pie-entrypoint.sh pie-configtest.sh#], '>&', \$output, timeout( 60 );
   $data{ 'configtest' } = $output;
   die "configtest failed" unless $res;
 
