@@ -55,6 +55,32 @@ apache_envset () {
   echoerr "APACHE_PROXY_PRESERVE_HOST: ${APACHE_PROXY_PRESERVE_HOST:=off}"
   export APACHE_PROXY_URL APACHE_PROXY_PRESERVE_HOST
 
+  echoerr "APACHE_SERVER_NAME (provided): ${APACHE_SERVER_NAME}"
+  if [[ -z $APACHE_SERVER_NAME ]]; then
+      if [[ -n $HOSTNAME ]]; then
+          # Take just the first entry returned from getent ahosts
+          hostname_ent=($(getent ahosts "$HOSTNAME" | egrep ' STREAM ' | head -n1))
+          if [[ ${#hostname_ent[*]} -gt 0 ]]; then
+              hostname_revent=($(getent ahosts "${hostname_ent[0]}" | egrep ' STREAM ' | head -n1))
+
+              if [[ ${#hostname_revent[*]} -gt 0 && ${hostname_revent[2]} == *"."* ]]; then
+                  echoerr "ServerName: using $HOSTNAME reverse lookup"
+                  APACHE_SERVER_NAME="${hostname_revent[2]}"
+              elif [[ $HOSTNAME == *"."* ]]; then
+                  echoerr "ServerName: using $HOSTNAME"
+                  APACHE_SERVER_NAME="$HOSTNAME"
+              else
+                  echoerr "ServerName: using $HOSTNAME host entry IP"
+                  APACHE_SERVER_NAME="${hostname_ent[0]}"
+              fi
+          else
+              echoerr "ServerName: unable to get the host entry for $HOSTNAME"
+          fi
+      fi
+      echoerr "APACHE_SERVER_NAME (calculated): ${APACHE_SERVER_NAME:=127.0.0.1}"
+  fi
+  export APACHE_SERVER_NAME
+
   echoerr "APACHE_SERVER_LIMIT (provided): ${APACHE_SERVER_LIMIT:=0}"
 
   if (( APACHE_SERVER_LIMIT <= 0 )); then

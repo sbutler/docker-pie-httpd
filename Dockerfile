@@ -138,7 +138,8 @@ RUN chmod a+rx /usr/local/bin/pie-configtest.sh
 ENV PIE_EXP_MEMORY_SIZE=30 \
     PIE_RES_MEMORY_SIZE=50
 
-ENV APACHE_SERVER_ADMIN=webmaster@example.org \
+ENV APACHE_SERVER_NAME="" \
+    APACHE_SERVER_ADMIN=webmaster@example.org \
     APACHE_ADMIN_SUBNET=10.0.0.0/8 \
     APACHE_REMOTEIP_TRUSTEDPROXYLIST_URL="https://s3.amazonaws.com/deploy-publish-illinois-edu/cloudfront-trustedproxylist.txt" \
     APACHE_REMOTEIP_HEADER=X-Forwarded-For \
