@@ -42,6 +42,7 @@ ARG HTTPD_DISMOD="\
 
 ARG HTTPD_ENMOD="\
     allowmethods \
+    asis \
     authnz_ldap \
     cache \
     cache_disk \
