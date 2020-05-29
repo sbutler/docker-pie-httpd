@@ -54,6 +54,7 @@ ARG HTTPD_ENMOD="\
     macro \
     proxy \
     proxy_fcgi \
+    proxy_html \
     proxy_http \
     remoteip \
     reqtimeout \
