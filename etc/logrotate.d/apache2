@@ -6,7 +6,9 @@
     create 640 root adm
     sharedscripts
     postrotate
-        kill -USR1 1
+        if pgrep -f ^/usr/sbin/apache2 > /dev/null; then
+            invoke-rc.d apache2 reload 2>&1 | logger -t apache2.logrotate
+        fi
     endscript
     prerotate
         for f in /var/log/apache2/*.log; do
